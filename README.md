@@ -1,11 +1,12 @@
 # Chess-by-web-mail
 
 Team Members:
- Name                | Email Address
----------------------|-------------------------
- Clayton Detke       | cdetke@purdue.edu
- Michael Beshear     | mbeshear@purdue.edu
- Michael Zhang       | zhan2793@purdue.edu
+
+Name | Email Address
+-------------- | --------------------
+Clayton Detke | cdetke@purdue.edu
+Michael Beshear | mbeshear@purdue.edu
+Michael Zhang | zhan2793@purdue.edu
 
 
 Project Name:

@@ -2,7 +2,7 @@
 <p>Welcome, {{ user.username }}</p>
 <p><a href="{% url 'new_game' %}">New Game</a></p>
 <table>
-    <tr><th>Name</th><th>Opponent</th><th>Status</th></tr>
+    <tr><th>Game Name</th><th>Opponent</th><th>Status</th></tr>
     {% for game in games %}
     <tr>
         <td><a href="{% url 'game' game.id %}">{{ game.name }}</a></td>

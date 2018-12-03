@@ -72,7 +72,7 @@ def inbox(request):
 
 @login_required
 def game(request, game_id):
-    return render(request, 'chess/game.html')
+    return render(request, 'chess/game.html', {'game_id': game_id})
 
 @login_required
 def game_data(request, game_id):

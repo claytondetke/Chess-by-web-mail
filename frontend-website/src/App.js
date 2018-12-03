@@ -7,14 +7,15 @@ class App extends Component {
         super(props);
 
         this.state = {
-            userID: -2,
+            userName: "",
             isLoading: false,
             isValidMove: false,
+            gameName: "",
             gameInfo: [],
             gameID: -1,
-            BUID: -1,
+            blackUser: "",
             bPresent: true,
-            WUID: -1,
+            whiteUser: "",
             wPresent: true,
             boardState: [[],[],[],[],[],[],[],[]],
             validMoves: [[],[],[],[],[],[],[],[]],
@@ -22,34 +23,40 @@ class App extends Component {
         };
     }
 
+    getColor(){
+
+    }
+
     async componentDidMount() {
-        /*return fetch()
-            .then(response => response.json())
-            .then(responseJson => this.setState({
-                gameInfo: responseJson
-            }))
-            .then(() => this.setState({
-                gameID: this.state.gameInfo.id,
-                BUID: this.state.gameInfo.blackUserID,
-                WUID: this.state.gameInfo.whiteUserID,
-                bPresent: this.state.gameInfo.blackUserPresent,
-                wPresent: this.state.gameInfo.whiteUserPresent,
-                boardState: this.boardStringToState(this.state.gameInfo.boardState),
-                gameState: this.state.gameInfo.gameState
-            }))
-            .then(() => console.log(this.state.gameInfo))
-            .then(() => this.setState({isLoading: false}));
-        */
+        // {"name": "1v1 fite me", "black_user": "user", "black_present": true, "white_user":
+        // "abc123", "white_present": true, "board_state": "RNBQKBNRPPPPPPPP                                pppppppprnbqkbnr",
+        // "game_state": "TW"}
+        let url = "/game/"+window.parent.game_id+"/data";
+        console.log(url);
+        try {
+            return fetch(url)
+                .then(response => response.json())
+                .then(responseJson => this.setState({
+                    gameInfo: responseJson
+                }))
+                .then(() => this.setState({
+                    gameName: this.state.gameInfo.name,
+                    blackUser: this.state.gameInfo.black_user,
+                    whiteUser: this.state.gameInfo.white_user,
+                    bPresent: this.state.gameInfo.black_present,
+                    wPresent: this.state.gameInfo.white_present,
+                    boardState: this.boardStringToState(this.state.gameInfo.board_state),
+                    gameState: this.state.gameInfo.game_state
+                }))
+                .then(() => console.log(this.state.gameInfo))
+                .then(() => this.setState({isLoading: false}));
+        }catch(e){
+            alert(e);
+        }
         this.setState({
-            gameID: 0,
-            BUID: 0,
-            WUID: -1,
-            bPresent: true,
-            wPresent: true,
-            gameState: "TB",
-            userID: 0,
-            boardState: this.boardStringToState("RNBQKBNRPPPPPPPP                                pppppppprnbqkbnr")
-        })
+            gameID: window.parent.game_id,
+            userName: window.parent.username
+        });
         console.log(this.state.boardState);
         return true;
     }
@@ -75,11 +82,11 @@ class App extends Component {
     }
 
     isMyTurn(){
-        if(this.state.userID === this.state.BUID){
+        if(this.state.userName === this.state.blackUser){
             if(this.state.gameState === "TB"){
                 return this.state.isValidMove;
             }else{ return false; }
-        }else if(this.state.userID === this.state.WUID){
+        }else if(this.state.userName === this.state.whiteUser){
             if(this.state.gameState === "TW"){
                 return this.state.isValidMove;
             }else{ return false; }
@@ -139,7 +146,7 @@ class App extends Component {
     }
     quitGame() {
         let url = "";//"https://hz08tdry07.execute-api.us-east-2.amazonaws.com/prod/admin/?command=edit&id=" + (this.state.key);
-        console.log(url);
+        //console.log(url);
         let data = {
 
         };

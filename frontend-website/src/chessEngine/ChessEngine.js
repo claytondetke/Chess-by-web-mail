@@ -1,11 +1,28 @@
-//Code to embed in the webpage
+/* Written by Michael Beshear
+   Chess engine integration with chess.js and chessboard.js
+   for a chess by mail server.
+   Requires both chess.js and chessboard.js to function
+ */
 
-//Start code
+//Board rendering the chess game
+var board = ChessBoard('board');
+//Chess game
+var game = new Chess();
+//Color of the person viewing the board
+var color = 'w';
 
-function renderBoard(charBoard) {
-    var board = ChessBoard('board');
-    var game = new Chess();
+//Renders a fen string board
+function renderFenBoard(fenBoard) {
+    //Clears current game
+    game.clear();
+    //Loads the fen position
+    game.load(fenBoard);
+    //Renders the game
+    board.position(game.fen());
+}
 
+//Renders a 2d char array board
+function renderCharBoard(charBoard) {
     //Clear board to make new chess game
     game.clear();
 
@@ -61,6 +78,7 @@ function renderBoard(charBoard) {
     board.position(game.fen());
 }
 
+//Converts an integer to a column index on a chess board
 function intToCol(i){
     switch (i) {
         case 0:
@@ -81,3 +99,42 @@ function intToCol(i){
             return 'h';
     }
 }
+
+//Sets the color of the player viewing the board
+// 'w' for white, 'b' for black
+function setColor(newColor){
+    color = newColor;
+}
+
+var onDragStart = function (source, piece) {
+    //Stops movement if the game is over
+    if(game.game_over()){
+        return false;
+    }
+
+    //Stops move if the person viewing the board has moved
+    if(game.turn() !== color){
+        return false;
+    }
+
+    //Stops move if the mover is moving the opposite color
+    if(color === 'w' && piece.search(/^b/) !== -1){
+        return false;
+    }
+    if(color === 'b' && piece.search(/^w/) !== -1){
+        return false;
+    }
+};
+
+var onDrop = function (source, target) {
+    //Saves the just made move as a chess.js move
+    //TODO add promotion options
+    //Also makes the move on the chess.js game
+    var move = game.move({from: source, to:target, promotion: 'q'});
+
+    //Checks if move is legal
+    if (move === null) {
+        //Return piece to position before move
+        return 'snapback';
+    }
+};

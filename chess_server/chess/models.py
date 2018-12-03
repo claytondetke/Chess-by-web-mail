@@ -1,8 +1,9 @@
 from django.db import models
+from django.contrib.auth import models as auth_models
 
 # Create your models here.
 class User(models.Model):
-    username = models.CharField(max_length=200, unique=True)
+    auth_user = models.OneToOneField(auth_models.User, on_delete=models.CASCADE)
 
 class Game(models.Model):
     DEFAULT_BOARD_STATE = ''

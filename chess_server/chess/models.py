@@ -1,12 +1,15 @@
 from django.db import models
 from django.contrib.auth import models as auth_models
 
+
 # Create your models here.
 class User(models.Model):
-    auth_user = models.OneToOneField(auth_models.User, on_delete=models.CASCADE)
+    auth_user = models.OneToOneField(
+        auth_models.User, on_delete=models.CASCADE, related_name='chess_user')
+
 
 class Game(models.Model):
-    DEFAULT_BOARD_STATE = ''
+    DEFAULT_BOARD_STATE = 'RNBQKBNRPPPPPPPP                                pppppppprnbqkbnr'
 
     GS_WHITE_TURN = 'TW'
     GS_BLACK_TURN = 'TB'
@@ -25,13 +28,16 @@ class Game(models.Model):
         )),
     )
 
-    black_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='game_black_set')
+    name = models.CharField(max_length=100)
+    black_user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='game_black_set')
     black_present = models.BooleanField(default=True)
-    white_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='game_white_set')
+    white_user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='game_white_set')
     white_present = models.BooleanField(default=True)
     board_state = models.CharField(max_length=64, default=DEFAULT_BOARD_STATE)
     game_state = models.CharField(
         max_length=2,
         choices=GAME_STATE_CHOICES,
-        default=GS_WHITE_TURN,
+        default=GS_WHITE_TURN, # white always goes first
     )

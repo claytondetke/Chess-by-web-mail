@@ -1,5 +1,5 @@
-<h1>Signup</h1>
-<form action="{% url 'signup' %}" method="post">
+<h1>New Game</h1>
+<form method="post" action="{% url 'new_game' %}">
     {% csrf_token %}
     <table>
         {% for field in form %}
@@ -12,5 +12,6 @@
         {% endif %}
         {% endfor %}
     </table>
-    <input type="submit" value="Signup">
+
+    <input type="submit" value="Create Game">
 </form>

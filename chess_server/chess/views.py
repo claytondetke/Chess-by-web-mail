@@ -2,7 +2,7 @@ import json
 
 from django.utils.translation import gettext as _
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseServerError, Http404
+from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseBadRequest, Http404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import models as auth_models
@@ -101,13 +101,15 @@ def game(request, game_id):
 def game_move(request, game_id):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
-    form = GameMoveForm(request.POST)
-    if not form.is_valid():
-        return HttpResponseServerError()
     game_m = get_object_or_404(models.Game, id=game_id)
     check_user_is_in_game(request.user.chess_user, game_m)
-    game_m.board_state = form.cleaned_data['board_state']
-    game_m.game_state = form.cleaned_data['game_state']
+    try:
+        jsonbody = json.loads(request.body)
+        game_m.board_state = jsonbody['board_state']
+        game_m.game_state = jsonbody['game_state']
+        game_m.full_clean()
+    except (ValidationError, json.JSONDecodeError):
+        return HttpResponseBadRequest()
     game_m.save()
     return redirect('game', game_id=game_id)
 

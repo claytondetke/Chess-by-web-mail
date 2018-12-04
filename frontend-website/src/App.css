@@ -1,7 +1,26 @@
-.App {
-    text-align: center;
-    font-size: calc(10px + 2vmin);
+.App .players {
+    display: inline-block;
+    vertical-align: top;
+    align-self: center;
+    margin-left: 3vw;
+    width: 20vw;
 }
 
-.App-header {
+.App .players:nth-child(1) {
+    margin-left: 0;
+}
+
+.App .players:nth-child(2) {
+    width: 40vw;
+}
+
+.App .buttons {
+    display: inline-block;
+    vertical-align: top;
+    align-self: center;
+    margin-left: 25px;
+}
+
+.App .buttons:nth-child(1) {
+    margin-left: 0;
 }

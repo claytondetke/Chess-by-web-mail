@@ -1,7 +1,10 @@
+{% extends "base.html" %}
+
+{% block title %}Game: {{ game_name }}{% endblock %}
+
 {% load static %}
 
-<html>
-<body>
+{% block content %}
 <script type="text/javascript">
  game_id = "{{ game_id|escapejs }}";
  username = "{{ username|escapejs }}";
@@ -24,5 +27,4 @@
     {% csrf_token %}
     <input type="submit" value="Quit Game" />
 </form>
-</body>
-</html>
+{% endblock %}

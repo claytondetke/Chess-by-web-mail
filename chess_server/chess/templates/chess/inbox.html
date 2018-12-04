@@ -1,5 +1,9 @@
+{% extends "base.html" %}
+
+{% block title %}Inbox{% endblock %}
+
+{% block content %}
 <h1>Inbox</h1>
-<p>Welcome, {{ user.username }}.</p>
 <p><a href="{% url 'new_game' %}">New Game</a></p>
 <table>
     <tr><th>Game Name</th><th>Opponent</th><th>Status</th></tr>
@@ -13,4 +17,4 @@
     <tr><td colspan="3">No current games</td></tr>
     {% endfor %}
 </table>
-<p><a href="{% url 'logout' %}">Logout</a></p>
+{% endblock %}

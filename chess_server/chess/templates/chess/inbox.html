@@ -1,8 +1,15 @@
-<h1>Inbox (WIP)</h1>
-<p>Welcome, {{ user.username }}</p>
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}Inbox{% endblock %}
+{% block extraheaders %}<link rel="stylesheet" href="{% static 'inbox.css' %}" type="text/css" media="screen" />{% endblock %}
+
+{% block content %}
+<h1>Inbox</h1>
 <p><a href="{% url 'new_game' %}">New Game</a></p>
-<table>
-    <tr><th>Name</th><th>Opponent</th><th>Status</th></tr>
+<table class="gamelist">
+    <tr><th>Game Name</th><th>Opponent</th><th>Status</th></tr>
     {% for game in games %}
     <tr>
         <td><a href="{% url 'game' game.id %}">{{ game.name }}</a></td>
@@ -13,4 +20,4 @@
     <tr><td colspan="3">No current games</td></tr>
     {% endfor %}
 </table>
-<p><a href="{% url 'logout' %}">Logout</a></p>
+{% endblock %}

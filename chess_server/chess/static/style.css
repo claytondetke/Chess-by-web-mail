@@ -1,0 +1,48 @@
+body {
+    /* TODO make less hideous */
+    background: lightblue;
+    margin: 0;
+    padding: 0;
+}
+
+div#header {
+    background: darkgray;
+    color: white;
+    margin: 0;
+    padding: 0;
+    top: 0;
+    width: 100%;
+}
+
+.sitetitle {
+    margin: 0;
+    padding: 10pt;
+}
+
+div#header p {
+    margin: 10pt;
+}
+
+ul#navbar {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+}
+
+ul#navbar li {
+    float: left;
+}
+
+ul#navbar li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 10pt 12pt;
+    text-decoration: none;
+}
+
+div#content {
+    padding: 10pt 20pt;
+}

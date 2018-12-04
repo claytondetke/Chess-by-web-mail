@@ -2,13 +2,14 @@ import json
 
 from django.utils.translation import gettext as _
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, HttpResponseNotAllowed
+from django.http import HttpResponse, HttpResponseNotAllowed, HttpResponseBadRequest, Http404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import models as auth_models
 from django.forms import ValidationError
+from django.views.decorators.csrf import csrf_exempt
 
-from .forms import NewGameForm
+from .forms import NewGameForm, GameMoveForm
 from . import models
 
 
@@ -58,13 +59,15 @@ def inbox(request):
         'name': game.name,
         'opponent': game.white_user.auth_user.username,
         'status': render_status_black(game.game_state)
-    } for game in request.user.chess_user.game_black_set.all()]
+    } for game in request.user.chess_user.game_black_set.all()
+                   if game.black_present]
     white_games = [{
         'id': game.id,
         'name': game.name,
         'opponent': game.black_user.auth_user.username,
         'status': render_status_white(game.game_state)
-    } for game in request.user.chess_user.game_white_set.all()]
+    } for game in request.user.chess_user.game_white_set.all()
+                   if game.white_present]
 
     return render(request, 'chess/inbox.html',
                   {'games': black_games + white_games})
@@ -72,11 +75,8 @@ def inbox(request):
 
 @login_required
 def game(request, game_id):
-    return render(request, 'chess/game.html')
-
-@login_required
-def game_data(request, game_id):
     game_m = get_object_or_404(models.Game, id=game_id)
+    check_user_is_in_game(request.user.chess_user, game_m)
     game_dict = {
         'name': game_m.name,
         'black_user': game_m.black_user.auth_user.username,
@@ -86,22 +86,41 @@ def game_data(request, game_id):
         'board_state': game_m.board_state,
         'game_state': game_m.game_state,
     }
-    return HttpResponse(json.dumps(game_dict), content_type='application/json')
+    return render(
+        request, 'chess/game.html', {
+            'game_id': game_id,
+            'username': request.user.username,
+            'move_form': GameMoveForm(),
+            'game_name': game_m.name,
+            'game_data': json.dumps(game_dict),
+        })
 
 
 @login_required
+@csrf_exempt # aaAAAAAAaaaaaAAAAAAAAAAAAAAAA
 def game_move(request, game_id):
-    #TODO
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
-    return redirect('game', game_id=game_id)
+    game_m = get_object_or_404(models.Game, id=game_id)
+    check_user_is_in_game(request.user.chess_user, game_m)
+    try:
+        jsonbody = json.loads(request.body)
+        game_m.board_state = jsonbody['board_state']
+        game_m.game_state = jsonbody['game_state']
+        game_m.full_clean()
+    except (ValidationError, json.JSONDecodeError):
+        return HttpResponseBadRequest()
+    game_m.save()
+    return HttpResponse()
 
 
 @login_required
+@csrf_exempt # aaAAAAAAaaaaaAAAAAAAAAAAAAAAA
 def game_quit(request, game_id):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
     game_m = get_object_or_404(models.Game, id=game_id)
+    check_user_is_in_game(request.user.chess_user, game_m)
     if game_m.black_user == request.user.chess_user:
         game_m.black_present = False
     else:
@@ -110,7 +129,7 @@ def game_quit(request, game_id):
         game_m.delete()
     else:
         game_m.save()
-    return redirect('inbox')
+    return HttpResponse()
 
 
 @login_required
@@ -131,8 +150,8 @@ def new_game(request):
                 else:
                     game_m = models.Game(
                         name=name,
-                        white_user=opponent,
-                        black_user=current_user)
+                        black_user=opponent,
+                        white_user=current_user)
                 game_m.save()
                 return redirect('game', game_id=game_m.id)
             form.add_error(
@@ -143,3 +162,9 @@ def new_game(request):
     else:
         form = NewGameForm()
     return render(request, 'chess/new_game.html', {'form': form})
+
+
+def check_user_is_in_game(user, game):
+    if not ((user == game.black_user and game.black_present) or
+            (user == game.white_user and game.white_present)):
+        raise Http404()

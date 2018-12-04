@@ -1,3 +1,8 @@
+{% extends "base.html" %}
+
+{% block title %}Signup{% endblock %}
+
+{% block content %}
 <h1>Signup</h1>
 <form action="{% url 'signup' %}" method="post">
     {% csrf_token %}
@@ -14,3 +19,4 @@
     </table>
     <input type="submit" value="Signup">
 </form>
+{% endblock %}

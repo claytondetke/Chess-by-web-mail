@@ -3,8 +3,9 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" href="{% static 'style.css' %}" type="text/css" media="screen" />
         <title>{% block title %}{% endblock %}</title>
+        <link rel="stylesheet" href="{% static 'style.css' %}" type="text/css" media="screen" />
+        {% block extraheaders %}{% endblock %}
     </head>
     <body>
         <div id="header">

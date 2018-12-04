@@ -1,11 +1,14 @@
 {% extends "base.html" %}
 
+{% load static %}
+
 {% block title %}Inbox{% endblock %}
+{% block extraheaders %}<link rel="stylesheet" href="{% static 'inbox.css' %}" type="text/css" media="screen" />{% endblock %}
 
 {% block content %}
 <h1>Inbox</h1>
 <p><a href="{% url 'new_game' %}">New Game</a></p>
-<table>
+<table class="gamelist">
     <tr><th>Game Name</th><th>Opponent</th><th>Status</th></tr>
     {% for game in games %}
     <tr>

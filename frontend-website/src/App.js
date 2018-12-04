@@ -90,7 +90,7 @@ class App extends Component {
     }
 
     validateForm() {
-        return true;//this.state.isValidMove && this.isMyTurn();
+        return this.state.isValidMove && this.isMyTurn();
     }
     handleSendMove = async event => {
         const confirmed = window.confirm(

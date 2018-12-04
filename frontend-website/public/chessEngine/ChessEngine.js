@@ -27,8 +27,8 @@ function renderCharBoard(charBoard) {
     game.clear();
 
     //Convert from 2d char array to Chess.js game
-    for(x = 0; x < 8; x++){
-        for(y = 0; y < 8; y++){
+    for(var x = 0; x < 8; x++){
+        for(var y = 0; y < 8; y++){
             var row = intToCol(x);
             var pos = row + y;
             switch(charBoard[x][y]){

@@ -43,8 +43,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'mod_wsgi.server',
 ]
+
+if not DEBUG:
+    INSTALLED_APPS.append('mod_wsgi.server')
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

@@ -1,7 +1,3 @@
-{% if user.is_authenticated %}
-<p><a href="{% url 'inbox' %}">Inbox</a></p>
-<p><a href="{% url 'logout' %}">Logout</a></p>
-{% else %}
-<p><a href="{% url 'login' %}">Login</a></p>
-<p><a href="{% url 'signup' %}">Signup</a></p>
-{% endif %}
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}

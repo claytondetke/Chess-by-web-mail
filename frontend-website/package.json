@@ -1,13 +1,16 @@
 {
-  "homepage": ".",
   "name": "frontend-website",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "jQuery": "^1.7.4",
+    "location": "0.0.1",
+    "navigator": "^1.0.1",
     "react": "^16.6.3",
     "react-bootstrap": "^0.32.4",
     "react-dom": "^16.6.3",
-    "react-scripts": "2.1.1"
+    "react-scripts": "2.1.1",
+    "xmlhttprequest": "^1.8.0"
   },
   "scripts": {
     "start": "react-scripts start",

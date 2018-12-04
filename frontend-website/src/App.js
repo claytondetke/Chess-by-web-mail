@@ -7,78 +7,79 @@ class App extends Component {
         super(props);
 
         this.state = {
-            userName: window.parent.username,
+            userID: -2,
             isLoading: false,
             isValidMove: false,
-            gameName: "",
-            gameInfo: JSON.parse(window.parent.game_data),
-            gameID: window.parent.game_id,
-            blackUser: "",
+            gameInfo: [],
+            gameID: -1,
+            BUID: -1,
             bPresent: true,
-            whiteUser: "",
+            WUID: -1,
             wPresent: true,
-            boardState: "",
+            boardState: [[],[],[],[],[],[],[],[]],
+            validMoves: [[],[],[],[],[],[],[],[]],
             gameState: ""
         };
     }
 
-    // returns "black" "white" or "error"
-    getColor(){
-        if(this.state.userName === this.state.blackUser){
-            return "black";
-        }else if(this.state.userName === this.state.whiteUser){
-            return "white";
-        }else{
-            return "error";
-        }
-    }
-
     async componentDidMount() {
-        // {"name": "1v1 fite me", "black_user": "user", "black_present": true, "white_user":
-        // "abc123", "white_present": true, "board_state": "RNBQKBNRPPPPPPPP                                pppppppprnbqkbnr",
-        // "game_state": "TW"}
-        try {
-            console.log(this.state.gameInfo);
-            this.setState({
-                gameName: this.state.gameInfo.name,
-                blackUser: this.state.gameInfo.black_user,
-                whiteUser: this.state.gameInfo.white_user,
-                bPresent: this.state.gameInfo.black_present,
-                wPresent: this.state.gameInfo.white_present,
-                boardState: this.state.gameInfo.board_state,
-                gameState: this.state.gameInfo.game_state
-            });
-            console.log(this.state.gameInfo);
-            this.setState({isLoading: false});
-        }catch(e){
-            alert(e);
-        }
+        /*return fetch()
+            .then(response => response.json())
+            .then(responseJson => this.setState({
+                gameInfo: responseJson
+            }))
+            .then(() => this.setState({
+                gameID: this.state.gameInfo.id,
+                BUID: this.state.gameInfo.blackUserID,
+                WUID: this.state.gameInfo.whiteUserID,
+                bPresent: this.state.gameInfo.blackUserPresent,
+                wPresent: this.state.gameInfo.whiteUserPresent,
+                boardState: this.boardStringToState(this.state.gameInfo.boardState),
+                gameState: this.state.gameInfo.gameState
+            }))
+            .then(() => console.log(this.state.gameInfo))
+            .then(() => this.setState({isLoading: false}));
+        */
+        this.setState({
+            gameID: 0,
+            BUID: 0,
+            WUID: -1,
+            bPresent: true,
+            wPresent: true,
+            gameState: "TB",
+            userID: 0,
+            boardState: this.boardStringToState("RNBQKBNRPPPPPPPP                                pppppppprnbqkbnr")
+        })
         console.log(this.state.boardState);
         return true;
     }
 
-    gameStateMessage(gs, col){
-        if(gs === "ED"){
-            return "IT'S A DRAW!";
-        }else if((gs === "EW" && col === "white") || (gs === "EB" && col === "black")){
-            return "YOU WIN!";
-        }else if((gs === "EB" && col === "white") || (gs === "EW" && col === "black")) {
-            return "YOU LOSE!";
-        }else if((gs === "TW" && col === "white") || (gs === "TB" && col === "black")) {
-            return "It is your turn.";
-        }else if((gs === "TB" && col === "white") || (gs === "TW" && col === "black")){
-            return "It is not your turn.";
-        }else{
-            return "ERROR!!!!!!";
+    boardStringToState(board) {
+        let boardStuff = this.state.boardState;
+        for(let y=0; y<8; y++){
+            for(let x=0; x<8; x++){
+                boardStuff[x][y] = board[(y*8)+x];
+            }
         }
+        return boardStuff;
+    }
+
+    boardStateToString(boardState){
+        let board = "";
+        for(let y=0; y<8; y++){
+            for(let x=0; x<8; x++){
+                board = board + boardState[x][y];
+            }
+        }
+        return board;
     }
 
     isMyTurn(){
-        if(this.state.userName === this.state.blackUser){
+        if(this.state.userID === this.state.BUID){
             if(this.state.gameState === "TB"){
                 return this.state.isValidMove;
             }else{ return false; }
-        }else if(this.state.userName === this.state.whiteUser){
+        }else if(this.state.userID === this.state.WUID){
             if(this.state.gameState === "TW"){
                 return this.state.isValidMove;
             }else{ return false; }
@@ -89,7 +90,7 @@ class App extends Component {
     }
 
     validateForm() {
-        return this.state.isValidMove && this.isMyTurn();
+        return this.state.isValidMove;
     }
     handleSendMove = async event => {
         const confirmed = window.confirm(
@@ -97,20 +98,20 @@ class App extends Component {
         );
         if (!confirmed) { return; }
         this.setState({ isLoading: true });
+
         try {
-            this.sendMove();
-            window.parent.location = "/inbox";
+            await this.sendMove();
+            this.props.history.push("/");
         } catch (e) {
             alert(e);
             this.setState({ isLoading: false });
         }
     }
     sendMove() {
-        let url = "/game/"+this.state.gameID+"/move";
+        let url = "";//"https://hz08tdry07.execute-api.us-east-2.amazonaws.com/prod/admin/?command=edit&id=" + (this.state.key);
         console.log(url);
         let data = {
-            board_state: this.state.boardState,
-            game_state: this.state.gameState
+            boardState: this.boardStateToString(this.state.boardState)
         };
         let outputData = JSON.stringify(data);
         console.log(outputData);
@@ -129,86 +130,71 @@ class App extends Component {
         if (!confirmed) { return; }
         this.setState({ isLoading: true });
         try {
-            this.quitGame();
-            window.parent.location = "/inbox";
+            await this.quitGame();
+            this.props.history.push("/");
         } catch (e) {
             alert(e);
             this.setState({ isLoading: false });
         }
     }
     quitGame() {
-        let url = "/game/"+this.state.gameID+"/quit";
+        let url = "";//"https://hz08tdry07.execute-api.us-east-2.amazonaws.com/prod/admin/?command=edit&id=" + (this.state.key);
         console.log(url);
+        let data = {
+
+        };
+        let outputData = JSON.stringify(data);
+        console.log(outputData);
         return fetch(url, {
             method: "POST",
+            body: outputData
         })
+            .then(response => response.json())
+            .then(response => console.log(response));
     }
 
 
     render() {
         return (
             <div className="App">
-                <div>
-                    {(this.getColor() === "black")
-                    ?
-                        <div>
-                            <div className="players">
-                                <h1>{"Black: "+this.state.blackUser}</h1>
-                            </div>
-                            <div className="players">
-                                <h1>{this.gameStateMessage(this.state.gameState, this.getColor())}</h1>
-                            </div>
-                            <div className="players">
-                                <h1>{"White: "+this.state.whiteUser}</h1>
-                            </div>
-                        </div>
-                    :
-                        <div>
-                            <div className="players">
-                                <h1>{"White: "+this.state.whiteUser}</h1>
-                            </div>
-                            <div className="players">
-                                <h1>{this.gameStateMessage(this.state.gameState, this.getColor())}</h1>
-                            </div>
-                            <div className="players">
-                                <h1>{"Black: "+this.state.blackUser}</h1>
-                            </div>
-                        </div>
-                    }
-                </div>
-                <div className="chessboard">
-                    //TODO: put chessboard here
-                </div>
-                <div className="buttons">
-                    <form onSubmit={this.handleSendMove}>
-                        <LoaderButton
-                            block
-                            bsStyle="primary"
-                            bsSize="large"
-                            disabled={!this.validateForm()}
-                            type="submit"
-                            isLoading={this.state.isLoading}
-                            text="Send Move"
-                            loadingText="Sending…"
-                            className="but"
-                        />
-                    </form>
-                </div>
-                <div className="buttons">
-                    <form onSubmit={this.handleQuit}>
-                        <LoaderButton
-                            block
-                            bsStyle="primary"
-                            bsSize="large"
-                            disabled={false}
-                            type="submit"
-                            isLoading={this.state.isLoading}
-                            text="Quit game"
-                            loadingText="Quitting…"
-                            className="but"
-                        />
-                    </form>
-                </div>
+                <header className="App-header">
+                    <p>
+                        Edit <code>src/App.js</code> and save to reload.
+                    </p>
+                    <a
+                        href="https://reactjs.org"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                    >
+                        Learn React
+                    </a>
+                </header>
+                <form onSubmit={this.handleSendMove}>
+                    <LoaderButton
+                        block
+                        bsStyle="primary"
+                        bsSize="large"
+                        disabled={!this.validateForm()}
+                        type="submit"
+                        isLoading={this.state.isLoading}
+                        text="Send Move"
+                        loadingText="Sending…"
+                        className="but"
+                    />
+                </form>
+                <form onSubmit={this.handleQuit}>
+                    <LoaderButton
+                        block
+                        bsStyle="primary"
+                        bsSize="large"
+                        disabled={false}
+                        type="submit"
+                        isLoading={this.state.isLoading}
+                        text="Quit game"
+                        loadingText="Quitting…"
+                        className="but"
+                    />
+                </form>
             </div>
         );
     }

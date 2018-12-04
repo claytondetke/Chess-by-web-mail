@@ -1,9 +1,0 @@
-table.gamelist {
-    border: 1px solid black;
-    border-collapse: collapse;
-}
-
-table.gamelist th, table.gamelist td {
-    border: 1px solid black;
-    padding: 10pt;
-}

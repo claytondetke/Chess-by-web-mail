@@ -31,6 +31,11 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="./chessEngine/Chess.js"></script>
     <script src="./chessEngine/chessboardjs-0.3.0/js/chessboard-0.3.0.js"></script>
+    <button type="button" id="submitButton" onclick="submitMove()">Submit Move</button>
+    <button type="button" id="myBtnK" onclick="choosePromotion(1)">Knight</button>
+    <button type="button" id="myBtnB" onclick="choosePromotion(2)">Bishop</button>
+    <button type="button" id="myBtnR" onclick="choosePromotion(3)">Rook</button>
+    <button type="button" id="myBtnQ" onclick="choosePromotion(4)">Queen</button>
     <script>
         /* Written by Michael Beshear
         Chess engine integration with chess.js and chessboard.js
@@ -39,26 +44,88 @@
         */
 
         //Board rendering the chess game
-        var board;
+        var gameInfo = JSON.parse(window.parent.game_data);
+        var fen = gameInfo.board_state;
+        console.log(fen);
+        var board = ChessBoard("board");
         //Chess game
         var game = new Chess();
         //Color of the person viewing the board
-        var color = 'w';
+        var color = getColor();
+        var promotion = "q";
+        choosePromotion(4);
 
+        var subBtn = document.getElementById("submitButton");
+        subBtn.disabled = true;
+
+        function choosePromotion(val) {
+            var k = document.getElementById("myBtnK");
+            var b = document.getElementById("myBtnB");
+            var r = document.getElementById("myBtnR");
+            var q = document.getElementById("myBtnQ");
+            k.disabled = false; b.disabled = false; r.disabled = false; q.disabled = false;
+            if(val === 1){ promotion = "k"; k.disabled = true; }
+            else if(val === 2){ promotion = "b"; b.disabled = true; }
+            else if(val === 3){ promotion = "r"; r.disabled = true; }
+            else if(val === 4){ promotion = "q"; q.disabled = true; }
+        }
+
+        function getColor(){
+            if(window.parent.username === gameInfo.black_user){
+                return "b";
+            }else{
+                return "w";
+            }
+        }
         //Renders a fen string board
-        function renderFenBoard(fenBoard) {
+        function renderFenBoard() {
+            fen = gameInfo.board_state;
             //Clears current game
             game.clear();
             //Loads the fen position
-            game.load(fenBoard);
+            game.load(fen);
             //Renders the game
             board.position(game.fen());
+        }
+
+        function gameResult(){
+            if(game.game_over() === false){
+                if(game.turn() === 'w'){
+                    return "TW";
+                }else{
+                    return "TB";
+                }
+            }
+            if(game.in_checkmate() === true){
+                if(game.turn() === 'w'){
+                    return "EB";
+                }else{
+                    return "EW";
+                }
+            }
+            if(game.in_stalemate() === true){
+                return "ED";
+            }
+            if(game.in_threefold_repetition() === true){
+                return "ED";
+            }
+            if(game.insufficient_material() === true){
+                return "ED";
+            }
+            return "ED";
         }
 
         //Sets the color of the player viewing the board
         // 'w' for white, 'b' for black
         function setColor(newColor){
             color = newColor;
+            if(color === 'b' && board.orientation() === 'white'){
+                board.flip();
+            }
+        }
+
+        function getFen(){
+            return game.fen();
         }
 
         var onDragStart = function (source, piece) {
@@ -85,14 +152,33 @@
             //Saves the just made move as a chess.js move
             //TODO add promotion options
             //Also makes the move on the chess.js game
-            var move = game.move({from: source, to:target, promotion: 'q'});
+            var move = game.move({from: source, to:target, promotion: promotion});
 
             //Checks if move is legal
             if (move === null) {
                 //Return piece to position before move
                 return 'snapback';
+            }else{
+                var subBtn = document.getElementById("submitButton");
+                subBtn.disabled = false;
             }
         };
+
+        function submitMove(){
+            var subBtn = document.getElementById("submitButton");
+            subBtn.disabled = true;
+            let url = "/game/"+window.parent.game_id+"/move";
+            let data = {
+                board_state: getFen(),
+                game_state: gameResult()
+            };
+            let outputData = JSON.stringify(data);
+            console.log(outputData);
+            return fetch(url, {
+                method: "POST",
+                body: outputData
+            })
+        }
 
         var cfg = {
             draggable: true,
@@ -102,6 +188,8 @@
         };
 
         board = ChessBoard('board', cfg);
+        renderFenBoard();
+        setColor(color);
     </script>
     <div id="root"></div>
     <!--

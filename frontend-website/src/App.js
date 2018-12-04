@@ -34,11 +34,7 @@ class App extends Component {
     }
 
     async componentDidMount() {
-        // {"name": "1v1 fite me", "black_user": "user", "black_present": true, "white_user":
-        // "abc123", "white_present": true, "board_state": "RNBQKBNRPPPPPPPP                                pppppppprnbqkbnr",
-        // "game_state": "TW"}
         try {
-            console.log(this.state.gameInfo);
             this.setState({
                 gameName: this.state.gameInfo.name,
                 blackUser: this.state.gameInfo.black_user,
@@ -124,7 +120,7 @@ class App extends Component {
 
     handleQuit = async event => {
         const confirmed = window.confirm(
-            "Are you sure you want to send this move?"
+            "Are you sure you want to quit this game?"
         );
         if (!confirmed) { return; }
         this.setState({ isLoading: true });
@@ -143,7 +139,6 @@ class App extends Component {
             method: "POST",
         })
     }
-
 
     render() {
         return (
@@ -176,22 +171,7 @@ class App extends Component {
                         </div>
                     }
                 </div>
-                <div className="buttons">
-                    <form onSubmit={this.handleSendMove}>
-                        <LoaderButton
-                            block
-                            bsStyle="primary"
-                            bsSize="large"
-                            disabled={!this.validateForm()}
-                            type="submit"
-                            isLoading={this.state.isLoading}
-                            text="Send Move"
-                            loadingText="Sending…"
-                            className="but"
-                        />
-                    </form>
-                </div>
-                <div className="buttons">
+                <div>
                     <form onSubmit={this.handleQuit}>
                         <LoaderButton
                             block

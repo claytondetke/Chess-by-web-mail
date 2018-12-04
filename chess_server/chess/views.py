@@ -111,7 +111,7 @@ def game_move(request, game_id):
     except (ValidationError, json.JSONDecodeError):
         return HttpResponseBadRequest()
     game_m.save()
-    return redirect('game', game_id=game_id)
+    return HttpResponse()
 
 
 @login_required
@@ -129,7 +129,7 @@ def game_quit(request, game_id):
         game_m.delete()
     else:
         game_m.save()
-    return redirect('inbox')
+    return HttpResponse()
 
 
 @login_required

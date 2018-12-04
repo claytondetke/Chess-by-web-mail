@@ -13,7 +13,7 @@
             {% if user.is_authenticated %}
             <p>Welcome, {{ user.username }}.</p>
             {% endif %}
-            <ul>
+            <ul id="navbar">
                 <li><a href="{% url 'home' %}">Home</a></li>
                 {% if user.is_authenticated %}
                 <li><a href="{% url 'inbox' %}">Inbox</a></li>

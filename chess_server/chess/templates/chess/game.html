@@ -13,7 +13,6 @@
  game_state_input_elementid = "{{ move_form.game_state.id_for_label|escapejs }}";
 </script>
 <h1>{{ game_name }}</h1>
-<p><a href="{% url 'inbox' %}">Inbox</a></p>
 <iframe src="{% static 'build/index.html' %}" frameborder="0" style="width:100%; height:60%;"></iframe>
 <form method="post" action="{% url 'game_move' game_id %}">
     {% csrf_token %}

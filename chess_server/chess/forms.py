@@ -7,7 +7,7 @@ from . import models
 
 class NewGameForm(forms.Form):
     name = forms.CharField(
-        label='Name',
+        label='Game Name',
         required=False,
         max_length=100,
         empty_value='Unnamed Game')

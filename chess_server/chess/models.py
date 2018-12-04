@@ -9,7 +9,7 @@ class User(models.Model):
 
 
 class Game(models.Model):
-    DEFAULT_BOARD_STATE = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+    DEFAULT_BOARD_STATE = 'RNBQKBNRPPPPPPPP                                pppppppprnbqkbnr'
 
     GS_WHITE_TURN = 'TW'
     GS_BLACK_TURN = 'TB'
@@ -35,7 +35,7 @@ class Game(models.Model):
     white_user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='game_white_set')
     white_present = models.BooleanField(default=True)
-    board_state = models.CharField(max_length=128, default=DEFAULT_BOARD_STATE)
+    board_state = models.CharField(max_length=64, default=DEFAULT_BOARD_STATE)
     game_state = models.CharField(
         max_length=2,
         choices=GAME_STATE_CHOICES,

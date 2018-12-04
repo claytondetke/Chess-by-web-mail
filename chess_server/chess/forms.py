@@ -22,7 +22,3 @@ class NewGameForm(forms.Form):
         except auth_models.User.DoesNotExist:
             raise forms.ValidationError(
                 _('Opponent username not found'), code='no_opponent')
-
-class GameMoveForm(forms.Form):
-    board_state = forms.CharField(max_length=128)
-    game_state = forms.ChoiceField(choices=models.Game.GAME_STATE_CHOICES)

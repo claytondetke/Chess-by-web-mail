@@ -8,7 +8,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import models as auth_models
 from django.forms import ValidationError
 from django.views.decorators.csrf import csrf_exempt
-from .forms import NewGameForm, GameMoveForm
+from .forms import NewGameForm
 from . import models
 
 
@@ -89,7 +89,6 @@ def game(request, game_id):
             request, 'chess/game.html', {
                 'game_id': game_id,
                 'username': request.user.username,
-                'move_form': GameMoveForm(),
                 'game_name': game_m.name,
                 'game_data': json.dumps(game_dict),
             })

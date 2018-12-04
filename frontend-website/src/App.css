@@ -3,5 +3,16 @@
     font-size: calc(10px + 2vmin);
 }
 
-.App-header {
+.App .players {
+    display: inline-block;
+    vertical-align: top;
+    align-self: center;
+    margin-left: 3vw;
+}
+
+.App .players:nth-child(1) {
+    margin-left: 0;
+}
+
+.App .chessboard {
 }

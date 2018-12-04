@@ -7,12 +7,12 @@ class App extends Component {
         super(props);
 
         this.state = {
-            userName: "",
+            userName: window.parent.username,
             isLoading: false,
             isValidMove: false,
             gameName: "",
-            gameInfo: [],
-            gameID: -1,
+            gameInfo: JSON.parse(window.parent.game_data),
+            gameID: window.parent.game_id,
             blackUser: "",
             bPresent: true,
             whiteUser: "",
@@ -23,62 +23,55 @@ class App extends Component {
         };
     }
 
+    // returns "black" "white" or "error"
     getColor(){
-
+        if(this.state.userName === this.state.blackUser){
+            return "black";
+        }else if(this.state.userName === this.state.whiteUser){
+            return "white";
+        }else{
+            return "error";
+        }
     }
 
     async componentDidMount() {
         // {"name": "1v1 fite me", "black_user": "user", "black_present": true, "white_user":
         // "abc123", "white_present": true, "board_state": "RNBQKBNRPPPPPPPP                                pppppppprnbqkbnr",
         // "game_state": "TW"}
-        let url = "/game/"+window.parent.game_id+"/data";
-        console.log(url);
         try {
-            return fetch(url)
-                .then(response => response.json())
-                .then(responseJson => this.setState({
-                    gameInfo: responseJson
-                }))
-                .then(() => this.setState({
-                    gameName: this.state.gameInfo.name,
-                    blackUser: this.state.gameInfo.black_user,
-                    whiteUser: this.state.gameInfo.white_user,
-                    bPresent: this.state.gameInfo.black_present,
-                    wPresent: this.state.gameInfo.white_present,
-                    boardState: this.boardStringToState(this.state.gameInfo.board_state),
-                    gameState: this.state.gameInfo.game_state
-                }))
-                .then(() => console.log(this.state.gameInfo))
-                .then(() => this.setState({isLoading: false}));
+            console.log(this.state.gameInfo);
+            this.setState({
+                gameName: this.state.gameInfo.name,
+                blackUser: this.state.gameInfo.black_user,
+                whiteUser: this.state.gameInfo.white_user,
+                bPresent: this.state.gameInfo.black_present,
+                wPresent: this.state.gameInfo.white_present,
+                boardState: this.state.gameInfo.board_state,
+                gameState: this.state.gameInfo.game_state
+            });
+            console.log(this.state.gameInfo);
+            this.setState({isLoading: false});
         }catch(e){
             alert(e);
         }
-        this.setState({
-            gameID: window.parent.game_id,
-            userName: window.parent.username
-        });
         console.log(this.state.boardState);
         return true;
     }
 
-    boardStringToState(board) {
-        let boardStuff = this.state.boardState;
-        for(let y=0; y<8; y++){
-            for(let x=0; x<8; x++){
-                boardStuff[x][y] = board[(y*8)+x];
-            }
+    gameStateMessage(gs, col){
+        if(gs === "ED"){
+            return "IT'S A DRAW!";
+        }else if((gs === "EW" && col === "white") || (gs === "EB" && col === "black")){
+            return "YOU WIN!";
+        }else if((gs === "EB" && col === "white") || (gs === "EW" && col === "black")) {
+            return "YOU LOSE!";
+        }else if((gs === "TW" && col === "white") || (gs === "TB" && col === "black")) {
+            return "It is your turn.";
+        }else if((gs === "TB" && col === "white") || (gs === "TW" && col === "black")){
+            return "It is not your turn.";
+        }else{
+            return "ERROR!!!!!!";
         }
-        return boardStuff;
-    }
-
-    boardStateToString(boardState){
-        let board = "";
-        for(let y=0; y<8; y++){
-            for(let x=0; x<8; x++){
-                board = board + boardState[x][y];
-            }
-        }
-        return board;
     }
 
     isMyTurn(){
@@ -97,7 +90,7 @@ class App extends Component {
     }
 
     validateForm() {
-        return this.state.isValidMove;
+        return true;//this.state.isValidMove && this.isMyTurn();
     }
     handleSendMove = async event => {
         const confirmed = window.confirm(
@@ -115,10 +108,11 @@ class App extends Component {
         }
     }
     sendMove() {
-        let url = "";//"https://hz08tdry07.execute-api.us-east-2.amazonaws.com/prod/admin/?command=edit&id=" + (this.state.key);
+        let url = "game/"+this.state.gameID+"/move";
         console.log(url);
         let data = {
-            boardState: this.boardStateToString(this.state.boardState)
+            board_state: this.state.boardState,
+            game_state: this.state.gameState
         };
         let outputData = JSON.stringify(data);
         console.log(outputData);
@@ -145,16 +139,10 @@ class App extends Component {
         }
     }
     quitGame() {
-        let url = "";//"https://hz08tdry07.execute-api.us-east-2.amazonaws.com/prod/admin/?command=edit&id=" + (this.state.key);
-        //console.log(url);
-        let data = {
-
-        };
-        let outputData = JSON.stringify(data);
-        console.log(outputData);
+        let url = "game/"+this.state.gameID+"/quit";
+        console.log(url);
         return fetch(url, {
             method: "POST",
-            body: outputData
         })
             .then(response => response.json())
             .then(response => console.log(response));
@@ -164,18 +152,36 @@ class App extends Component {
     render() {
         return (
             <div className="App">
-                <header className="App-header">
-                    <p>
-                        Edit <code>src/App.js</code> and save to reload.
-                    </p>
-                    <a
-                        href="https://reactjs.org"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        Learn React
-                    </a>
-                </header>
+                <div className="players">
+                    {(this.getColor() === "black")
+                    ?
+                        <div>
+                            <div className="players">
+                                <h1>{"Black: "+this.state.blackUser}</h1>
+                            </div>
+                            <div className="players">
+                                <h1>{this.gameStateMessage(this.state.gameState, this.getColor())}</h1>
+                            </div>
+                            <div className="players">
+                                <h1>{"White: "+this.state.whiteUser}</h1>
+                            </div>
+                        </div>
+                    :
+                        <div>
+                            <div className="players">
+                                <h1>{"White: "+this.state.whiteUser}</h1>
+                            </div>
+                            <div className="players">
+                                <h1>{this.gameStateMessage(this.state.gameState, this.getColor())}</h1>
+                            </div>
+                            <div className="players">
+                                <h1>{"Black: "+this.state.blackUser}</h1>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div className="chessboard">
+                </div>
                 <form onSubmit={this.handleSendMove}>
                     <LoaderButton
                         block

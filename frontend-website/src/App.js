@@ -17,8 +17,7 @@ class App extends Component {
             bPresent: true,
             whiteUser: "",
             wPresent: true,
-            boardState: [[],[],[],[],[],[],[],[]],
-            validMoves: [[],[],[],[],[],[],[],[]],
+            boardState: "",
             gameState: ""
         };
     }
@@ -98,17 +97,16 @@ class App extends Component {
         );
         if (!confirmed) { return; }
         this.setState({ isLoading: true });
-
         try {
-            await this.sendMove();
-            this.props.history.push("/");
+            this.sendMove();
+            window.parent.location = "/inbox";
         } catch (e) {
             alert(e);
             this.setState({ isLoading: false });
         }
     }
     sendMove() {
-        let url = "game/"+this.state.gameID+"/move";
+        let url = "/game/"+this.state.gameID+"/move";
         console.log(url);
         let data = {
             board_state: this.state.boardState,
@@ -131,28 +129,26 @@ class App extends Component {
         if (!confirmed) { return; }
         this.setState({ isLoading: true });
         try {
-            await this.quitGame();
-            this.props.history.push("/");
+            this.quitGame();
+            window.parent.location = "/inbox";
         } catch (e) {
             alert(e);
             this.setState({ isLoading: false });
         }
     }
     quitGame() {
-        let url = "game/"+this.state.gameID+"/quit";
+        let url = "/game/"+this.state.gameID+"/quit";
         console.log(url);
         return fetch(url, {
             method: "POST",
         })
-            .then(response => response.json())
-            .then(response => console.log(response));
     }
 
 
     render() {
         return (
             <div className="App">
-                <div className="players">
+                <div>
                     {(this.getColor() === "black")
                     ?
                         <div>
@@ -181,33 +177,38 @@ class App extends Component {
                     }
                 </div>
                 <div className="chessboard">
+                    //TODO: put chessboard here
                 </div>
-                <form onSubmit={this.handleSendMove}>
-                    <LoaderButton
-                        block
-                        bsStyle="primary"
-                        bsSize="large"
-                        disabled={!this.validateForm()}
-                        type="submit"
-                        isLoading={this.state.isLoading}
-                        text="Send Move"
-                        loadingText="Sending…"
-                        className="but"
-                    />
-                </form>
-                <form onSubmit={this.handleQuit}>
-                    <LoaderButton
-                        block
-                        bsStyle="primary"
-                        bsSize="large"
-                        disabled={false}
-                        type="submit"
-                        isLoading={this.state.isLoading}
-                        text="Quit game"
-                        loadingText="Quitting…"
-                        className="but"
-                    />
-                </form>
+                <div className="buttons">
+                    <form onSubmit={this.handleSendMove}>
+                        <LoaderButton
+                            block
+                            bsStyle="primary"
+                            bsSize="large"
+                            disabled={!this.validateForm()}
+                            type="submit"
+                            isLoading={this.state.isLoading}
+                            text="Send Move"
+                            loadingText="Sending…"
+                            className="but"
+                        />
+                    </form>
+                </div>
+                <div className="buttons">
+                    <form onSubmit={this.handleQuit}>
+                        <LoaderButton
+                            block
+                            bsStyle="primary"
+                            bsSize="large"
+                            disabled={false}
+                            type="submit"
+                            isLoading={this.state.isLoading}
+                            text="Quit game"
+                            loadingText="Quitting…"
+                            className="but"
+                        />
+                    </form>
+                </div>
             </div>
         );
     }

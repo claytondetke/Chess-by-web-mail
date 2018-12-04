@@ -101,16 +101,16 @@ def game_move(request, game_id):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
     game_m = get_object_or_404(models.Game, id=game_id)
-        check_user_is_in_game(request.user.chess_user, game_m)
-        try:
-            jsonbody = json.loads(request.body)
-            game_m.board_state = jsonbody['board_state']
-            game_m.game_state = jsonbody['game_state']
-            game_m.full_clean()
-        except (ValidationError, json.JSONDecodeError):
-            return HttpResponseBadRequest()
-        game_m.save()
-        return HttpResponse()
+    check_user_is_in_game(request.user.chess_user, game_m)
+    try:
+        jsonbody = json.loads(request.body)
+        game_m.board_state = jsonbody['board_state']
+        game_m.game_state = jsonbody['game_state']
+        game_m.full_clean()
+    except (ValidationError, json.JSONDecodeError):
+        return HttpResponseBadRequest()
+    game_m.save()
+    return HttpResponse()
 
 
 @login_required

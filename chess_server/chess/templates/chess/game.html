@@ -13,17 +13,5 @@
  game_state_input_elementid = "{{ move_form.game_state.id_for_label|escapejs }}";
 </script>
 <h1>{{ game_name }}</h1>
-<iframe src="{% static 'build/index.html' %}" frameborder="0" style="width:100%; height:60%;"></iframe>
-<form method="post" action="{% url 'game_move' game_id %}">
-    {% csrf_token %}
-    <div hidden="true">
-        {{ move_form.board_state }}
-        {{ move_form.game_state }}
-    </div>
-    <input type="submit" value="Submit Move" />
-</form>
-<form method="post" action="{% url 'game_quit' game_id %}">
-    {% csrf_token %}
-    <input type="submit" value="Quit Game" />
-</form>
+<iframe src="{% static 'build/index.html' %}" frameborder="0" style="width:100%; height:70vh;"></iframe>
 {% endblock %}

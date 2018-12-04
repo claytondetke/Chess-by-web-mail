@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import models as auth_models
 from django.forms import ValidationError
+from django.views.decorators.csrf import csrf_exempt
 
 from .forms import NewGameForm, GameMoveForm
 from . import models
@@ -96,6 +97,7 @@ def game(request, game_id):
 
 
 @login_required
+@csrf_exempt # aaAAAAAAaaaaaAAAAAAAAAAAAAAAA
 def game_move(request, game_id):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
@@ -111,6 +113,7 @@ def game_move(request, game_id):
 
 
 @login_required
+@csrf_exempt # aaAAAAAAaaaaaAAAAAAAAAAAAAAAA
 def game_quit(request, game_id):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
